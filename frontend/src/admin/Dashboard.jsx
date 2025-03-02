@@ -32,6 +32,7 @@ const Dashboard = () => {
   const [revenueData, setRevenueData] = useState([]);
   const [orderStatusData, setOrderStatusData] = useState([]);
   const [videos, setVideos] = useState([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -41,7 +42,6 @@ const Dashboard = () => {
 
         let orders, users, verifiedUsers;
 
-        // Sample data as fallback
         const sampleOrders = [
           { order_id: "ORD001", amount: 50000, status: "paid", createdAt: "2025-03-01T10:00:00Z", products: [{}, {}, {}], shippingAddress: { name: "John Doe" } },
           { order_id: "ORD002", amount: 75000, status: "created", createdAt: "2025-02-28T15:00:00Z", products: [{}], shippingAddress: { name: "Jane Smith" } },
@@ -62,7 +62,6 @@ const Dashboard = () => {
           { id: "3", videoUrl: "https://example.com/video3.mp4", category: "KIDS", size: "L", price: 300 },
         ];
 
-        // Fetch all orders
         try {
           const ordersResponse = await axios.get(`${backend}/api/users/orders`, {
             headers: { Authorization: `Bearer ${token}` },
@@ -73,7 +72,6 @@ const Dashboard = () => {
           orders = sampleOrders;
         }
 
-        // Fetch all users
         try {
           const usersResponse = await axios.get(`${backend}/api/users`, {
             headers: { Authorization: `Bearer ${token}` },
@@ -84,7 +82,6 @@ const Dashboard = () => {
           users = sampleUsers;
         }
 
-        // Fetch verified users (optional, using sample if fails)
         try {
           const verifiedUsersResponse = await axios.get(`${backend}/api/auth/verified-users`, {
             headers: { Authorization: `Bearer ${token}` },
@@ -95,7 +92,6 @@ const Dashboard = () => {
           verifiedUsers = sampleUsers.slice(0, 3);
         }
 
-        // Fetch all videos (optional, using sample if fails)
         try {
           const videosResponse = await axios.get(`${backend}/api/videos/all`, {
             headers: { Authorization: `Bearer ${token}` },
@@ -106,7 +102,6 @@ const Dashboard = () => {
           setVideos(sampleVideos);
         }
 
-        // Calculate stats
         const totalRevenue = orders.reduce((sum, order) => sum + (order.amount / 100), 0);
         const totalOrders = orders.length;
         const totalUsers = users.length;
@@ -140,7 +135,6 @@ const Dashboard = () => {
 
       } catch (err) {
         console.error('Dashboard fetch error, using sample data:', err);
-        // Use sample data if all fetches fail
         const sampleOrders = [
           { order_id: "ORD001", amount: 50000, status: "paid", createdAt: "2025-03-01T10:00:00Z", products: [{}, {}, {}], shippingAddress: { name: "John Doe" } },
           { order_id: "ORD002", amount: 75000, status: "created", createdAt: "2025-02-28T15:00:00Z", products: [{}], shippingAddress: { name: "Jane Smith" } },
@@ -217,19 +211,33 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-indigo-600"></div>
-        <p className="ml-4 text-lg text-gray-700 font-medium">Loading dashboard...</p>
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-gray-100 flex items-center justify-center flex-col">
+        <div className="animate-spin rounded-full h-12 w-12 md:h-16 md:w-16 border-t-4 border-indigo-600"></div>
+        <p className="mt-2 text-sm md:text-lg text-gray-700 font-medium">Loading dashboard...</p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-screen lg:flex-row bg-gradient-to-br from-indigo-50 to-gray-100">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-indigo-50 to-gray-100 lg:flex-row">
+      {/* Mobile Sidebar Toggle */}
+      <div className="lg:hidden p-4 bg-gradient-to-b from-gray-900 to-gray-800 text-white flex justify-between items-center">
+        <h2 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+          Admin Dashboard
+        </h2>
+        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="text-2xl">
+          {isSidebarOpen ? '✕' : '☰'}
+        </button>
+      </div>
+
       {/* Sidebar */}
-      <aside className="lg:w-64 w-full bg-gradient-to-b from-gray-900 to-gray-800 text-white p-6 lg:h-screen lg:sticky lg:top-0">
-        <div className="flex flex-col gap-6">
-          <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+      <aside
+        className={`lg:w-64 w-full bg-gradient-to-b from-gray-900 to-gray-800 text-white p-4 lg:p-6 lg:h-screen lg:sticky lg:top-0 fixed top-0 left-0 h-full transition-transform duration-300 ${
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } lg:translate-x-0 z-30`}
+      >
+        <div className="flex flex-col gap-4 lg:gap-6">
+          <h2 className="text-xl lg:text-2xl font-bold text-center bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent hidden lg:block">
             Admin Dashboard
           </h2>
           <nav>
@@ -247,7 +255,8 @@ const Dashboard = () => {
                 <li key={index}>
                   <Link
                     to={item.to}
-                    className="flex items-center gap-3 py-2.5 px-4 rounded-lg text-gray-300 hover:bg-gray-700/50 hover:text-white transition-all duration-200 group"
+                    className="flex items-center gap-3 py-2.5 px-4 rounded-lg text-gray-300 hover:bg-gray-700/50 hover:text-white transition-all duration-200 group text-sm lg:text-base"
+                    onClick={() => setIsSidebarOpen(false)}
                   >
                     {item.icon}
                     <span className="group-hover:translate-x-1 transition-transform">{item.label}</span>
@@ -260,16 +269,16 @@ const Dashboard = () => {
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 p-6">
+      <main className="flex-1 p-4 lg:p-8">
         {/* Header */}
-        <header className="bg-white shadow-lg p-6 rounded-xl mb-6">
-          <div className="flex items-center justify-between">
-            <div className="relative w-96">
-              <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
+        <header className="bg-white shadow-lg p-4 lg:p-6 rounded-xl mb-4 lg:mb-8">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="relative w-full sm:w-80 lg:w-96">
+              <Search className="absolute left-3 top-2 lg:top-2.5 text-gray-400" size={18} />
               <input
                 type="text"
                 placeholder="Search analytics..."
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 text-sm lg:text-base"
               />
             </div>
             <div className="flex items-center gap-4">
@@ -282,7 +291,7 @@ const Dashboard = () => {
         </header>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-4 lg:mb-8">
           {[
             { title: 'Total Users', value: stats.totalUsers, icon: <User size={20} />, color: 'from-blue-500 to-blue-700' },
             { title: 'Revenue', value: stats.totalRevenue, icon: <DollarSign size={20} />, color: 'from-green-500 to-green-700' },
@@ -291,7 +300,7 @@ const Dashboard = () => {
           ].map((card, index) => (
             <div
               key={index}
-              className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 group transform hover:-translate-y-1"
+              className="bg-white rounded-xl p-4 lg:p-6 shadow-lg hover:shadow-xl transition-all duration-300 group transform hover:-translate-y-1"
             >
               <div className="flex justify-between items-start">
                 <div className={`p-3 rounded-lg bg-gradient-to-r ${card.color}`}>
@@ -299,19 +308,23 @@ const Dashboard = () => {
                 </div>
                 <span className="text-sm text-green-500 font-medium">+{Math.random() * 10}%</span>
               </div>
-              <h3 className="text-gray-500 text-sm mt-4">{card.title}</h3>
-              <p className="text-2xl font-bold text-gray-800 mt-1">{card.value}</p>
+              <h3 className="text-gray-500 text-sm lg:text-base mt-4">{card.title}</h3>
+              <p className="text-xl lg:text-2xl font-bold text-gray-800 mt-1">{card.value}</p>
               <div className={`h-1 mt-4 bg-gradient-to-r ${card.color} rounded-full opacity-0 group-hover:opacity-100 transition-opacity`}></div>
             </div>
           ))}
         </div>
 
         {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-6">
-            <h4 className="text-lg font-semibold text-gray-800 mb-4">Revenue Overview</h4>
-            <div className="h-64">
-              <ReBarChart width={600} height={250} data={revenueData}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 mb-4 lg:mb-8">
+          <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-4 lg:p-6">
+            <h4 className="text-lg lg:text-xl font-semibold text-gray-800 mb-4">Revenue Overview</h4>
+            <div className="h-64 w-full overflow-x-auto">
+              <ReBarChart 
+                width={window.innerWidth < 1024 ? Math.max(window.innerWidth - 40, 300) : 800} 
+                height={250} 
+                data={revenueData}
+              >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
@@ -322,17 +335,17 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h4 className="text-lg font-semibold text-gray-800 mb-4">Order Status Distribution</h4>
+          <div className="bg-white rounded-xl shadow-lg p-4 lg:p-6">
+            <h4 className="text-lg lg:text-xl font-semibold text-gray-800 mb-4">Order Status Distribution</h4>
             <div className="h-64 flex items-center justify-center">
-              <RePieChart width={200} height={200}>
+              <RePieChart width={window.innerWidth < 640 ? 160 : 250} height={window.innerWidth < 640 ? 160 : 250}>
                 <Pie
                   data={orderStatusData}
                   dataKey="value"
                   cx="50%"
                   cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
+                  innerRadius={window.innerWidth < 640 ? 40 : 70}
+                  outerRadius={window.innerWidth < 640 ? 60 : 100}
                   paddingAngle={5}
                 >
                   {orderStatusData.map((entry, index) => (
@@ -342,11 +355,11 @@ const Dashboard = () => {
                 <Tooltip />
               </RePieChart>
             </div>
-            <div className="flex justify-center gap-4 mt-4">
+            <div className="flex justify-center gap-4 mt-4 flex-wrap">
               {orderStatusData.map((item, index) => (
                 <div key={index} className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                  <span className="text-sm text-gray-600">{item.name}</span>
+                  <span className="text-sm lg:text-base text-gray-600">{item.name}</span>
                 </div>
               ))}
             </div>
@@ -354,29 +367,29 @@ const Dashboard = () => {
         </div>
 
         {/* Tables Section */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-            <div className="p-5 bg-gradient-to-r from-indigo-50 to-gray-100 border-b">
-              <h4 className="text-lg font-semibold text-gray-800">Recent Orders</h4>
+            <div className="p-4 lg:p-5 bg-gradient-to-r from-indigo-50 to-gray-100 border-b">
+              <h4 className="text-lg lg:text-xl font-semibold text-gray-800">Recent Orders</h4>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-indigo-100">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase">Order ID</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase">Customer</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase">Status</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-indigo-700 uppercase">Amount</th>
+                    <th className="px-4 lg:px-6 py-2 lg:py-3 text-left text-xs font-medium text-indigo-700 uppercase">Order ID</th>
+                    <th className="px-4 lg:px-6 py-2 lg:py-3 text-left text-xs font-medium text-indigo-700 uppercase">Customer</th>
+                    <th className="px-4 lg:px-6 py-2 lg:py-3 text-left text-xs font-medium text-indigo-700 uppercase">Status</th>
+                    <th className="px-4 lg:px-6 py-2 lg:py-3 text-right text-xs font-medium text-indigo-700 uppercase">Amount</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {recentOrders.map((order) => (
                     <tr key={order.order_id} className="hover:bg-indigo-50 transition-colors">
-                      <td className="px-6 py-4 text-sm text-gray-900">{order.order_id}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{order.shippingAddress?.name || 'N/A'}</td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 lg:px-6 py-3 lg:py-4 text-sm lg:text-base text-gray-900">{order.order_id}</td>
+                      <td className="px-4 lg:px-6 py-3 lg:py-4 text-sm lg:text-base text-gray-600">{order.shippingAddress?.name || 'N/A'}</td>
+                      <td className="px-4 lg:px-6 py-3 lg:py-4">
                         <span
-                          className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          className={`px-2 py-1 text-xs lg:text-sm font-medium rounded-full ${
                             order.status === 'paid'
                               ? 'bg-green-100 text-green-800'
                               : order.status === 'created'
@@ -387,7 +400,7 @@ const Dashboard = () => {
                           {order.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right text-sm text-gray-900">
+                      <td className="px-4 lg:px-6 py-3 lg:py-4 text-right text-sm lg:text-base text-gray-900">
                         ₹{(order.amount / 100).toFixed(2)}
                       </td>
                     </tr>
@@ -398,28 +411,28 @@ const Dashboard = () => {
           </div>
 
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-            <div className="p-5 bg-gradient-to-r from-indigo-50 to-gray-100 border-b">
-              <h4 className="text-lg font-semibold text-gray-800">Recent Customers</h4>
+            <div className="p-4 lg:p-5 bg-gradient-to-r from-indigo-50 to-gray-100 border-b">
+              <h4 className="text-lg lg:text-xl font-semibold text-gray-800">Recent Customers</h4>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-indigo-100">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase">Name</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase">Email</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase">Verified</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-indigo-700 uppercase">Orders</th>
+                    <th className="px-4 lg:px-6 py-2 lg:py-3 text-left text-xs font-medium text-indigo-700 uppercase">Name</th>
+                    <th className="px-4 lg:px-6 py-2 lg:py-3 text-left text-xs font-medium text-indigo-700 uppercase">Email</th>
+                    <th className="px-4 lg:px-6 py-2 lg:py-3 text-left text-xs font-medium text-indigo-700 uppercase">Verified</th>
+                    <th className="px-4 lg:px-6 py-2 lg:py-3 text-right text-xs font-medium text-indigo-700 uppercase">Orders</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {recentUsers.map((user) => (
                     <tr key={user._id} className="hover:bg-indigo-50 transition-colors">
-                      <td className="px-6 py-4 text-sm text-gray-900">{user.name}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
+                      <td className="px-4 lg:px-6 py-3 lg:py-4 text-sm lg:text-base text-gray-900">{user.name}</td>
+                      <td className="px-4 lg:px-6 py-3 lg:py-4 text-sm lg:text-base text-gray-600">{user.email}</td>
+                      <td className="px-4 lg:px-6 py-3 lg:py-4 text-sm lg:text-base text-gray-600">
                         {user.verified ? 'Yes' : 'No'}
                       </td>
-                      <td className="px-6 py-4 text-right text-sm text-gray-900">
+                      <td className="px-4 lg:px-6 py-3 lg:py-4 text-right text-sm lg:text-base text-gray-900">
                         {Math.floor(Math.random() * 5)}
                       </td>
                     </tr>
@@ -429,7 +442,7 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

@@ -18,7 +18,8 @@ const CloudinaryPlayer = () => {
     const fetchVideosAndPrices = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/videos/data/${selectedCategory}/${selectedSize}`
+          const backend = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+          `${backend}/api/videos/data/${selectedCategory}/${selectedSize}`
         );
 
         if (!response.ok)

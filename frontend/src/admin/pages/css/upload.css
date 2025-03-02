@@ -1,0 +1,85 @@
+/* Center the main container */
+div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 500px;
+  margin: auto;
+  margin-top: 20px;
+  padding: 20px;
+  background: #bbdcff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+/* Dropdown labels */
+label {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 10px 0 5px;
+  color: #333;
+}
+
+/* Dropdown styling */
+.size-dropdown,
+.category-dropdown {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  outline: none;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.size-dropdown:hover,
+.category-dropdown:hover {
+  border-color: #007bff;
+}
+
+/* Upload button */
+.cloudinary-button {
+  margin-top: 15px;
+  padding: 10px 15px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.cloudinary-button:hover {
+  background: #0056b3;
+}
+
+.cloudinary-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* Video display section */
+video {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Uploaded video details */
+p {
+  font-size: 14px;
+  font-weight: 500;
+  color: #444;
+  margin-top: 5px;
+}
+
+strong {
+  color: #007bff;
+}

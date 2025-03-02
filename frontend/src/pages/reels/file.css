@@ -1,0 +1,71 @@
+/* Ensure full-screen height and smooth scrolling */
+.reel-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory; /* Snap to each video */
+  background-color: #000;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+/* Wrapper for each video */
+.video-wrapper {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  scroll-snap-align: start; /* Snap to the start of each video */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Video styling */
+.reel-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Overlay for captions and buttons */
+.video-overlay {
+  position: absolute;
+  bottom: 10%;
+  left: 5%;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+  font-size: 16px;
+}
+
+/* Like button */
+.like-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.like-button:hover {
+  color: red;
+}
+
+/* 💡 Mobile-Specific Adjustments */
+@media (max-width: 768px) {
+  .video-overlay {
+    font-size: 14px;
+    bottom: 15%;
+    left: 8%;
+  }
+
+  .like-button {
+    font-size: 20px;
+  }
+}
+
+/* Fix scrolling issues on iOS */
+body {
+  overscroll-behavior-y: contain;
+}

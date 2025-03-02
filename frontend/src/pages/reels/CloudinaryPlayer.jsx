@@ -13,12 +13,12 @@ const CloudinaryPlayer = () => {
   const queryParams = new URLSearchParams(location.search);
   const selectedCategory = (queryParams.get("category") || "MEN").toUpperCase();
   const selectedSize = (queryParams.get("size") || "M").toUpperCase();
+   const backend = import.meta.env.VITE_BACKEND_URL || "https://sangtani-premium-backend.onrender.com";
 
   useEffect(() => {
     const fetchVideosAndPrices = async () => {
       try {
         const response = await fetch(
-          const backend = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
           `${backend}/api/videos/data/${selectedCategory}/${selectedSize}`
         );
 

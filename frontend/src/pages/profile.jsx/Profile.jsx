@@ -100,7 +100,7 @@ const UserDashboard = () => {
               My Account
             </h2>
             <nav className="space-y-3">
-              <Link to="/orders" className="flex items-center p-3 rounded-lg bg-indigo-100 text-indigo-600 font-medium hover:bg-indigo-200 transition-colors">
+              <Link to="" className="flex items-center p-3 rounded-lg bg-indigo-100 text-indigo-600 font-medium hover:bg-indigo-200 transition-colors">
                 <FaBox className="mr-3" />
                 My Orders
               </Link>

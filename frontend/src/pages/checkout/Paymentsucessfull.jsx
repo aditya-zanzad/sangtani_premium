@@ -23,7 +23,7 @@ const PaymentSuccessful = () => {
     }
   }, [urlOrderId]);
 
-  const fetchOrderDetails = async (orderIdToFetch) => {
+  const fetchOrderDetails = async (orderIdToFetch, retries = 3, delay = 2000) => {
     if (!orderIdToFetch) {
       setError("Please enter an Order ID");
       return;
@@ -32,22 +32,31 @@ const PaymentSuccessful = () => {
     setLoading(true);
     setError(null);
 
-    try {
-      const backend = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-      const { data } = await axios.get(`${backend}/api/orders/${orderIdToFetch}`);
+    const attemptFetch = async (attempt) => {
+      try {
+        const backend = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+        const { data } = await axios.get(`${backend}/api/orders/${orderIdToFetch}`);
 
-      if (!data) {
-        throw new Error("Order not found");
+        if (!data) {
+          throw new Error("Order not found");
+        }
+
+        setOrder(data);
+        fetchProductDetails(data.products);
+        setLoading(false);
+      } catch (err) {
+        if (attempt < retries && err.message === "Order not found") {
+          setError("Order not found yet. Retrying...");
+          setTimeout(() => attemptFetch(attempt + 1), delay);
+        } else {
+          setError(err.message || "Failed to fetch order details");
+          setOrder(null);
+          setLoading(false);
+        }
       }
+    };
 
-      setOrder(data);
-      fetchProductDetails(data.products);
-    } catch (err) {
-      setError(err.message || "Failed to fetch order details");
-      setOrder(null);
-    } finally {
-      setLoading(false);
-    }
+    attemptFetch(0);
   };
 
   const fetchProductDetails = async (productIds) => {
@@ -145,6 +154,13 @@ const PaymentSuccessful = () => {
             </div>
           )
         )}
+
+        <Link
+          to="/"
+          className="mt-6 inline-flex items-center px-6 py-3 bg-gray-600 text-white rounded-full hover:bg-gray-700"
+        >
+          <Home className="mr-2" /> Back to Home
+        </Link>
       </div>
     </div>
   );

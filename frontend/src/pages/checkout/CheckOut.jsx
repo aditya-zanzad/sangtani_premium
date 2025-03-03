@@ -109,7 +109,7 @@ const Checkout = () => {
               payment_id: response.razorpay_payment_id
             });
             localStorage.removeItem("cart");
-            window.location.href = `/order-confirmation/${data.id}`;
+            window.location.href = `/order-confirmation`;
           } catch (error) {
             console.error("Confirmation failed:", error);
             alert("Payment succeeded but confirmation failed. Contact support.");

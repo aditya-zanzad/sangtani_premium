@@ -97,7 +97,7 @@ const AppRoutes = () => {
       {/* Public Routes */}
       <Route path="/api/cloudinary/videos" element={<CloudinaryPlayer />} />
       <Route path="/payment_success" element={<PaymentSuccessful/>} />
-      <Route path="/order-confirmation" element={<OrderConfirmation/>} />
+      <Route path="/order-confirmation/:orderId" element={<OrderConfirmation/>} />
 
       {/* Admin Routes */}
       <Route

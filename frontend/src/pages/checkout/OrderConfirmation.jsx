@@ -1,156 +1,62 @@
-import { useEffect, useState } from 'react'; // Removed unnecessary React import
-import { useParams, Link } from 'react-router-dom';
-import { CheckCircle, Clock, Package } from 'lucide-react';
-import axios from 'axios';
-import React from 'react';
+import React from "react";
+import { CheckCircle, Home, Package } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 
 const OrderConfirmation = () => {
-  const { orderId } = useParams(); // orderId is something like "order_Q1S5ZBWKe1dBGT"
-  const [order, setOrder] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        const backend = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
-        const { data } = await axios.get(`${backend}/api/orders/${orderId}`);
-
-        if (!data) {
-          throw new Error('Order not found');
-        }
-
-        setOrder(data);
-      } catch (error) {
-        setError(error.message || 'Failed to fetch order details');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrder();
-  }, [orderId]);
-
-  if (loading) {
-    return (
-      <div className="text-center p-8">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600">Loading order details...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="text-center py-8">
-        <div className="text-red-500 text-4xl mb-4">⚠️</div>
-        <p className="text-red-500 mb-4">{error}</p>
-        <Link to="/orders" className="text-indigo-600 hover:text-indigo-800">
-          Back to Orders
-        </Link>
-      </div>
-    );
-  }
-
-  if (!order) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-red-500 mb-4">Order not found</p>
-        <Link to="/orders" className="text-indigo-600 hover:text-indigo-800">
-          Back to Orders
-        </Link>
-      </div>
-    );
-  }
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const paymentId = queryParams.get("payment_id");
+  const orderId = queryParams.get("order_id");
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-          <div className="flex items-center mb-6">
-            <CheckCircle className="w-12 h-12 text-green-600 mr-4" />
-            <h1 className="text-3xl font-bold">Order Confirmed!</h1>
-          </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-100 via-white to-green-50 p-6">
+      <div className="bg-white p-8 rounded-2xl shadow-xl text-center max-w-md w-full transform transition-all hover:scale-105">
+        {/* Success Icon */}
+        <CheckCircle className="w-20 h-20 text-green-500 mx-auto animate-pulse" />
 
-          {/* Order Details */}
-          <div className="grid md:grid-cols-2 gap-6 mb-8">
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h2 className="text-lg font-semibold mb-4">Order Details</h2>
-              <p className="mb-2">
-                <strong>Order ID:</strong> {order.order_id || 'N/A'}
-              </p>
-              <p className="mb-2">
-                <strong>Date:</strong>{" "}
-                {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}
-              </p>
-              <p className="mb-2">
-                <strong>Status:</strong>{" "}
-                <span className="text-green-600">{order.status || 'Processing'}</span>
-              </p>
-            </div>
+        {/* Heading */}
+        <h1 className="text-4xl font-extrabold text-gray-800 mt-6 mb-2">
+          Payment Successful!
+        </h1>
+        <p className="text-gray-600 text-lg">Thank you for your purchase. Your order is confirmed!</p>
 
-            {/* Payment Details */}
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h2 className="text-lg font-semibold mb-4">Payment Details</h2>
-              <p className="mb-2">
-                <strong>Amount Paid:</strong> ₹{(order.amount / 100).toFixed(2) || '0.00'}
-              </p>
-              <p className="mb-2">
-                <strong>Payment ID:</strong> {order.payment_id || 'N/A'}
-              </p>
-              <p className="mb-2">
-                <strong>Payment Method:</strong> Razorpay
-              </p>
-            </div>
-          </div>
-
-          {/* Shipping Address */}
-          {order.shippingAddress && (
-            <div className="bg-gray-50 p-4 rounded-lg mb-8">
-              <h2 className="text-lg font-semibold mb-4">Shipping Address</h2>
-              <p className="mb-1">{order.shippingAddress.name || 'N/A'}</p>
-              <p className="mb-1">{order.shippingAddress.street || ''}</p>
-              <p className="mb-1">
-                {order.shippingAddress.city || ''}{order.shippingAddress.pincode ? `, ${order.shippingAddress.pincode}` : ''}
-              </p>
-              <p className="mb-1">📞 {order.shippingAddress.phone || 'N/A'}</p>
-              <p className="mb-1">📧 {order.shippingAddress.email || 'N/A'}</p>
-            </div>
-          )}
-
-          {/* Products */}
-          <div className="border-t pt-6">
-            <h2 className="text-xl font-semibold mb-4 flex items-center">
-              <Package className="w-6 h-6 mr-2" />
-              Purchased Items
+        {/* Order Summary Card */}
+        {(paymentId || orderId) && (
+          <div className="mt-8 bg-green-50 p-6 rounded-lg shadow-inner text-left">
+            <h2 className="text-xl font-semibold text-green-700 mb-4 flex items-center">
+              <Package className="mr-2" /> Order Summary
             </h2>
-            <div className="space-y-4">
-              {order.products && order.products.length > 0 ? (
-                order.products.map((product, index) => (
-                  <div key={index} className="flex items-center justify-between border-b pb-4">
-                    <div>
-                      <p className="font-medium">{product.category} ({product.size})</p>
-                      <p className="text-sm text-gray-500">Qty: {product.quantity || 1}</p>
-                    </div>
-                    <p className="font-medium">
-                      ₹{(product.price ? product.price * (product.quantity || 1) : (order.amount / 100 / order.products.length)).toFixed(2)}
-                    </p>
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500">No items found in this order.</p>
-              )}
-            </div>
+            {orderId && (
+              <p className="text-sm text-gray-700">
+                <span className="font-medium">Order ID:</span> {orderId}
+              </p>
+            )}
+            {paymentId && (
+              <p className="text-sm text-gray-700">
+                <span className="font-medium">Payment ID:</span> {paymentId}
+              </p>
+            )}
           </div>
-        </div>
+        )}
 
-        <div className="bg-white rounded-xl shadow-md p-6 text-center">
-          <p className="text-gray-600 mb-4">
-            <Clock className="inline-block w-5 h-5 mr-2" />
-            Your order will be processed within 24 hours
-          </p>
-          <Link to="/categories" className="text-indigo-600 hover:text-indigo-800 font-medium">
-            Continue Shopping →
+        {/* Message if no query params */}
+        {!paymentId && !orderId && (
+          <p className="mt-6 text-gray-500">No order details provided.</p>
+        )}
+
+        {/* Buttons */}
+        <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+          <Link
+            to="/profile"
+            className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-all shadow-md hover:shadow-lg"
+          >
+            <Package className="mr-2" /> My Orders
+          </Link>
+          <Link
+            to="/categories"
+            className="inline-flex items-center px-6 py-3 bg-gray-600 text-white rounded-full hover:bg-gray-700 transition-all shadow-md hover:shadow-lg"
+          >
+            <Home className="mr-2" /> Back to Home
           </Link>
         </div>
       </div>

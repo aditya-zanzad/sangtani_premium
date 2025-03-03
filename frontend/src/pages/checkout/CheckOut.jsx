@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { CreditCard, Truck, ShieldCheck, ArrowLeft, Package } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
 
 const loadRazorpay = (src) => {
   return new Promise((resolve) => {
@@ -54,6 +56,8 @@ const Checkout = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+ 
+  const navigate = useNavigate();
 
   const handlePayment = async () => {
     if (!validateForm()) {
@@ -109,6 +113,7 @@ const Checkout = () => {
               payment_id: response.razorpay_payment_id
             });
             localStorage.removeItem("cart");
+            navigate("/order-confirmation");
             window.location.href = `/order-confirmation`;
           } catch (error) {
             console.error("Confirmation failed:", error);
